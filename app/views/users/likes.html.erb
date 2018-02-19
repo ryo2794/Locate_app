@@ -1,0 +1,66 @@
+<!-- 指定されたコードを貼り付けてください -->
+<div class="main user-show">
+  <div class="container">
+    <div class="user">
+      <img src="<%= "/user_images/#{@user.image_name}" %>">
+      <h2><%= @user.name %></h2>
+      <p><%= @user.email %></p>
+      <% if @current_user && @user.id == @current_user.id %>
+        <%= link_to("編集", "/users/#{@user.id}/edit") %>
+      <% end %>
+    </div>
+    
+    <ul class="user-tabs">
+      <li><%= link_to("投稿", "/users/#{@user.id}") %></li>
+      <li class="active"><%= link_to("いいね!", "/users/#{@user.id}/likes") %></li>
+    </ul>
+    
+    <% @likes.each do |like| %>
+
+      <% post = Post.find_by(id: like.post_id) %>
+      
+      <div class="posts-index-item">
+        <div class="post-left">
+          <img src="<%= "/user_images/#{post.user.image_name}" %>">
+        </div>
+        <div class="post-right">
+          <div class="post-user-name">
+            <%= link_to(post.user.name, "/users/#{post.user.id}") %>
+          </div>
+          <%= link_to(post.content, "/posts/#{post.id}") %>
+        </div>
+      </div>
+        <div class="posts-index-contents">
+          <div class="contents-left">
+            <!-- Google Map 描画 -->
+            <div id="map_<%= post.id %>" style="width: 400px; height: 400px;"></div>
+            <!-- Google Map 描画 -->
+          </div>
+          
+          <div class="contents-right">
+            <!--投稿画像を表示 --!>
+            <% if post.image_name %>
+              <img src="<%= "/post_images/#{post.image_name}" %>" width="500" height="400">
+            <% end %>
+          </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Google Map 描画 -->
+<script>
+
+<%= i=0 %>
+<% @user.posts.each do |post| %>
+  handler_<%= post.id %> = Gmaps.build('Google');
+  handler_<%= post.id %>.buildMap({ provider: {}, internal: {id: 'map_<%= post.id %>'}}, function(){
+    markers_<%= post.id %> = handler_<%= post.id %>.addMarker(<%= raw @hash[i].to_json %>);
+    handler_<%= post.id %>.bounds.extendWith(markers_<%= post.id %>);
+    handler_<%= post.id %>.fitMapToBounds();
+    handler_<%= post.id %>.getMap().setZoom(15);
+  });
+  <%= i=i+1 %>
+<% end %>
+
+</script>

@@ -1,0 +1,40 @@
+<div class="main posts-new">
+  <div class="container">
+    <h1 class="form-heading">投稿する</h1>
+    <%= form_tag("/posts/create", {multipart: true}) do %>
+      <div class="form">
+        <div class="form-body">
+          <% @post.errors.full_messages.each do |message| %>
+            <div class="form-error">
+              <%= message %>
+            </div>
+          <% end %>
+          <p>場所</p>
+          <input name="name" value=<%= @post.name %>>
+          <p>投稿</p>
+          <textarea name="content"><%= @post.content %></textarea>
+          <p>画像</p>
+          <input name="image" type="file">
+          <% if @hash %>
+            <div id="map" style="width: 510px; height: 400px;"></div>
+          <% end %>
+          
+          <input type="submit" value="投稿">
+          <%= submit_tag "検索", name: "search" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Google Map 描画 -->
+<script>
+
+  handler = Gmaps.build('Google');
+  handler.buildMap({ provider: {}, internal: {id: 'map'}}, function(){
+    markers = handler.addMarkers(<%= raw @hash.to_json %>);
+    handler.bounds.extendWith(markers);
+    handler.fitMapToBounds();
+    handler.getMap().setZoom(15);
+  });
+</script>
